@@ -29,4 +29,11 @@ typedef struct
     uint16_t transparent;
 } Texture;
 
+typedef struct
+{
+    Texture texture;
+    int x, y;
+    float angle;
+} Sprite;
+
 #endif

@@ -1,13 +1,16 @@
 #include "Common.h"
-#include "Structs.h"
 #include "Defines.h"
 #include "Draw.h"
+#include "Enums.h"
 #include "Input.h"
 #include "Loadgfx.h"
+#include "Structs.h"
 #include "Text.h"
 #include "Video.h"
 
 int running = 1;
+extern Texture Textures[];
+Sprite sprite_array[1];
 
 void quit()
 {   
@@ -21,13 +24,18 @@ void main()
     initKeyboard();
     loadFont();
     loadAllTextures();
+
+    sprite_array[0].texture = Textures[BRICKS];
+    sprite_array[0].x = 140;
+    sprite_array[0].y = 90;
+    sprite_array[0].angle = RAD_15;
     
     while (running == 1)
     {
         processInput();
-        render();
         drawStuff();
-        delay(50);
+        render();
+        //delay(50);
     }
     quit();
 }

@@ -4,7 +4,7 @@
 #include "Structs.h"
 
 void drawSprite(int x, int y, Texture* texture);
-void drawMap(Map* map);
+Texture rotateTexture(int angle, Texture* source, uint8_t bgcolor);
 void drawStuff();
 
 #endif /* DRAW_H */

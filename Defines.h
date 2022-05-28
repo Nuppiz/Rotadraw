@@ -14,6 +14,7 @@
 #define SCREEN_HEIGHT       200       /* height in pixels of mode 0x13 */
 #define SCREEN_SIZE         64000
 #define TRANSPARENT_COLOR   13
+#define COLOR_WHITE         15
 
 /* Character set defines */
 #define TILE_WIDTH          8
@@ -60,6 +61,8 @@
 
 /* Math defines */
 #define degToRad(degree)    ((degree) * M_PI / 180.0)
+#define radToDeg(radians)   (radians * 180.0 / M_PI)
+#define RAD_1               0.0174532925
 #define RAD_15              (M_PI/12)
 #define RAD_30              (M_PI/6)
 #define RAD_45              (M_PI/4)
@@ -78,5 +81,6 @@
 /* Misc / general defines */
 #define TRUE                1
 #define FALSE               0
+#define test                sprite_array[0]
 
 #endif

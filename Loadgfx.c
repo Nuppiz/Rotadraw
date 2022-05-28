@@ -33,4 +33,5 @@ void loadTexture(char* filename, int texture_index)
 void loadAllTextures()
 {
     loadTexture("BRICKS.7UP", BRICKS);
+    loadTexture("BRACKS.7UP", BRACKS);
 }

@@ -4,6 +4,7 @@
 enum TextureCount
 {
     BRICKS,
+    BRACKS,
     NUM_TEXTURES
 };
 
