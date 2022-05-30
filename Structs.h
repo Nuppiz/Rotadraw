@@ -27,13 +27,14 @@ typedef struct
     uint16_t height;
     uint16_t width;
     uint16_t transparent;
+    uint8_t mirrorFlip;
 } Texture;
 
 typedef struct
 {
     Texture texture;
     int x, y;
-    float angle;
+    double angle;
 } Sprite;
 
 #endif

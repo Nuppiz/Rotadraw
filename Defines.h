@@ -70,7 +70,7 @@
 #define RAD_90              (M_PI/2)
 #define RAD_135             (M_PI/1.5)
 #define RAD_180             (M_PI)
-#define RAD_240             (1.5*M_PI)
+#define RAD_270             (1.5*M_PI)
 #define RAD_360             (2*M_PI)
 
 /* Macros */

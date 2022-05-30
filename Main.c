@@ -29,13 +29,14 @@ void main()
     sprite_array[0].x = 140;
     sprite_array[0].y = 90;
     sprite_array[0].angle = RAD_15;
+    Textures[BRICKS].mirrorFlip = FALSE;
     
     while (running == 1)
     {
         processInput();
         drawStuff();
         render();
-        //delay(50);
+        delay(50);
     }
     quit();
 }

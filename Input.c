@@ -9,14 +9,14 @@ extern Sprite sprite_array[];
 
 void controlIngame()
 {
-    if (KEY_IS_PRESSED(KEY_LEFT))
+    if (KEY_IS_PRESSED(KEY_LEFT) && test.angle > -RAD_360)
     {
-        test.angle -= RAD_1;
+        test.angle -= RAD_15;
         //test.texture = rotateTexture(test.angle, &test.texture, TRANSPARENT_COLOR);
     }
-    if (KEY_IS_PRESSED(KEY_RIGHT))
+    if (KEY_IS_PRESSED(KEY_RIGHT) && test.angle < RAD_360)
     {
-        test.angle += RAD_1;
+        test.angle += RAD_15;
         //test.texture = rotateTexture(test.angle, &test.texture, TRANSPARENT_COLOR);
     }
 }

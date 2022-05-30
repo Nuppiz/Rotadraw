@@ -9,6 +9,9 @@ extern uint8_t far screen_buf [];
 extern Sprite sprite_array[];
 extern Texture Textures[];
 
+int w_diff;
+int h_diff;
+
 int boundaryCheck(int x, int y)
 {
     if (x < SCREEN_WIDTH && x >= 0 && y < SCREEN_HEIGHT && y >= 0)
@@ -16,17 +19,6 @@ int boundaryCheck(int x, int y)
     else
         return FALSE;
 }
-
-/*int boundaryCheckRadius(int x, int y, int radius)
-{
-    if (x < SCREEN_WIDTH - radius && x >= 0 + radius && y < SCREEN_HEIGHT - radius && y >= 0 + radius)
-        return FULLY_IN;
-    else if (x - radius > SCREEN_WIDTH || x + radius < 0 ||
-            y - radius > SCREEN_HEIGHT || y + radius < 0)
-        return FULLY_OUT;
-    else
-        return PARTIAL;
-}*/
 
 int boundaryCheck_X(int x)
 {
@@ -106,90 +98,24 @@ void drawSprite(int x, int y, Texture* texture)
     }
 }
 
-/*void drawSpritePartial(int x, int y, int start_x, int start_y, Texture* texture)
-{
-    int pix_x = x;
-    int pix_y = y;
-    int index_x;
-    int index_y;
-    int i = start_x;
-
-    if (start_x < 0)
-        i = 0;
-
-    if (texture->transparent == TRUE)
-    {
-        for (index_y = 0; index_y < texture->height; index_y++)
-        {
-            for (index_x = 0; index_x < texture->width; index_x++)
-            {
-                if (texture->pixels[i] != TRANSPARENT_COLOR)
-                {
-                    if (pix_x < SCREEN_WIDTH && pix_y < SCREEN_HEIGHT)
-                    {
-                        SET_PIXEL(pix_x, pix_y, texture->pixels[i]);
-                        i++;
-                        pix_x++;
-                    }
-                    else
-                    {
-                        i++;
-                        pix_x++;
-                    }
-                }
-                else
-                {
-                    i++;
-                    pix_x++;
-                }
-            }
-            i += start_x;
-            pix_x = x;
-            pix_y++;
-        }
-    }
-    else
-    {
-        for (index_y = 0; index_y < texture->height; index_y++)
-        {
-            for (index_x = 0; index_x < texture->width; index_x++)
-            {
-                if (pix_x < SCREEN_WIDTH && pix_y < SCREEN_HEIGHT)
-                {
-                    SET_PIXEL(pix_x, pix_y, texture->pixels[i]);
-                    i++;
-                    pix_x++;
-                }
-                else
-                {
-                    i++;
-                    pix_x++;
-                }
-            }
-            pix_x = x;
-            pix_y++;
-        }
-    }
-}*/
-
-float rotateShearX(Vec2 source, float angle)
+float rotateShearX(Vec2 source, double angle)
 {
     float new_loc;
 
     new_loc = source.x - tan(angle / 2) * source.y;
 
-    //new_loc = (int)new_loc;
+    new_loc = (int)new_loc;
 
     return new_loc;
 }
 
-float rotateShearY(Vec2 source, float angle)
+float rotateShearY(Vec2 source, double angle)
 {
     float new_loc;
 
     new_loc = source.y + sin(angle) * source.x;
 
-    //new_loc = (int)new_loc;
+    new_loc = (int)new_loc;
 
     return new_loc;
 }
@@ -228,23 +154,42 @@ Vec2 shearMatrixVec2(float matrix[4], Vec2 v)
    return result;
 }
 
-Texture rotateTexture(float angle, Texture* source, uint8_t bgcolor)
+Texture rotateTexture(double angle, Texture* source, uint8_t bgcolor)
 {
     Texture rotated;
     Vec2 sheared;
     int w;
     int h;
-    int w_diff;
-    int h_diff;
     int w_half;
     int h_half;
     int i = 0;
     float rot_i;
     int rotated_size;
-    float theta_t = -(tan(angle / 2));
-    float theta_s = sin(angle);
+    float theta_t;
+    float theta_s;
     float matrix_x[4] = {1.0, 0.0, 0.0, 1.0};
     float matrix_y[4] = {1.0, 0.0, 0.0, 1.0};
+
+    if (angle > RAD_270)
+        angle -= RAD_360;
+
+    else if (angle < -RAD_270)
+        angle += RAD_360;
+
+    if (angle > RAD_90)
+    {
+        angle -= RAD_180;
+        source->mirrorFlip = TRUE;
+    }
+
+    else if (angle < -RAD_90)
+    {
+        angle += RAD_180;
+        source->mirrorFlip = TRUE;
+    }
+
+    theta_t = -(tan(angle / 2));
+    theta_s = sin(angle);
 
     matrix_x[1] = theta_t;
     matrix_y[2] = theta_s;
@@ -262,23 +207,41 @@ Texture rotateTexture(float angle, Texture* source, uint8_t bgcolor)
     rotated_size = rotated.width * rotated.height;
     memset(rotated.pixels, bgcolor, rotated_size);
 
-    for (h = -h_half; h < h_half; h++)
+    if (source->mirrorFlip == TRUE)
     {
-        for (w = -w_half; w < w_half; w++)
+        for (h = -h_half; h < h_half; h++)
         {
-            sheared.x = w;
-            sheared.y = h;
-            /*sheared = shearMatrixVec2(matrix_x, sheared);
-            sheared = shearMatrixVec2(matrix_y, sheared);
-            sheared = shearMatrixVec2(matrix_x, sheared);*/
-            sheared.x = rotateShearX(sheared, angle);
-            sheared.y = rotateShearY(sheared, angle);
-            sheared.x = rotateShearX(sheared, angle);
-            rot_i = ((int)sheared.y + h_diff + h_half) * rotated.width + (sheared.x + w_diff + w_half);
-            rotated.pixels[(int)rot_i] = source->pixels[i];
-            i++;
+            for (w = -w_half; w < w_half; w++)
+            {
+                sheared.x = w;
+                sheared.y = h;
+                sheared.x = rotateShearX(sheared, angle);
+                sheared.y = rotateShearY(sheared, angle);
+                sheared.x = rotateShearX(sheared, angle);
+                rot_i = ((rotated.height - ((int)sheared.y + h_diff + h_half))) * rotated.width + (rotated.width - (sheared.x + w_diff + w_half));
+                rotated.pixels[(int)rot_i] = source->pixels[i];
+                i++;
+            }
         }
     }
+    else
+    {
+        for (h = -h_half; h < h_half; h++)
+        {
+            for (w = -w_half; w < w_half; w++)
+            {
+                sheared.x = w;
+                sheared.y = h;
+                sheared.x = rotateShearX(sheared, angle);
+                sheared.y = rotateShearY(sheared, angle);
+                sheared.x = rotateShearX(sheared, angle);
+                rot_i = ((int)sheared.y + h_diff + h_half) * rotated.width + (sheared.x + w_diff + w_half);
+                rotated.pixels[(int)rot_i] = source->pixels[i];
+                i++;
+            }
+        }
+    }
+
     return rotated;
 }
 
@@ -303,7 +266,11 @@ void drawRectangle(int x, int y, int w, int h, uint8_t color)
 
 void drawStuff()
 {
-    test.angle -= RAD_15;
+    char angle_str [20];
+    float deg_angle = radToDeg(test.angle);
+    //test.angle -= RAD_15;
+    sprintf(angle_str, "ANGLE: %f", deg_angle);
+    drawText(65, 75, angle_str, COLOR_WHITE);
     test.texture = rotateTexture(test.angle, &Textures[BRICKS], TRANSPARENT_COLOR);
-    drawSprite(test.x, test.y, &test.texture);
+    drawSprite(test.x - w_diff, test.y - h_diff, &test.texture);
 }
