@@ -9,9 +9,6 @@ extern uint8_t far screen_buf [];
 extern Sprite sprite_array[];
 extern Texture Textures[];
 
-int w_diff;
-int h_diff;
-
 int boundaryCheck(int x, int y)
 {
     if (x < SCREEN_WIDTH && x >= 0 && y < SCREEN_HEIGHT && y >= 0)
@@ -194,11 +191,11 @@ Texture rotateTexture(double angle, Texture* source, uint8_t bgcolor)
     matrix_x[1] = theta_t;
     matrix_y[2] = theta_s;
  
-    rotated.width = abs(source->height * sin(angle)) + abs(source->width * cos(angle)) + 5;
-    rotated.height = abs(source->width * sin(angle)) + abs(source->height * cos(angle)) + 5;
+    rotated.width = abs(source->height * sin(angle)) + abs(source->width * cos(angle)) + 2;
+    rotated.height = abs(source->width * sin(angle)) + abs(source->height * cos(angle)) + 2;
 
-    w_diff = (rotated.width - source->width) / 2;
-    h_diff = (rotated.height - source->height) / 2;
+    source->offset_x = (rotated.width - source->width) / 2;
+    source->offset_y = (rotated.height - source->height) / 2;
 
     w_half = source->width / 2;
     h_half = source->height / 2;
@@ -218,7 +215,7 @@ Texture rotateTexture(double angle, Texture* source, uint8_t bgcolor)
                 sheared.x = rotateShearX(sheared, angle);
                 sheared.y = rotateShearY(sheared, angle);
                 sheared.x = rotateShearX(sheared, angle);
-                rot_i = ((rotated.height - ((int)sheared.y + h_diff + h_half))) * rotated.width + (rotated.width - (sheared.x + w_diff + w_half));
+                rot_i = ((rotated.height - ((int)sheared.y + source->offset_y + h_half))) * rotated.width + (rotated.width - (sheared.x + source->offset_x + w_half));
                 rotated.pixels[(int)rot_i] = source->pixels[i];
                 i++;
             }
@@ -235,7 +232,7 @@ Texture rotateTexture(double angle, Texture* source, uint8_t bgcolor)
                 sheared.x = rotateShearX(sheared, angle);
                 sheared.y = rotateShearY(sheared, angle);
                 sheared.x = rotateShearX(sheared, angle);
-                rot_i = ((int)sheared.y + h_diff + h_half) * rotated.width + (sheared.x + w_diff + w_half);
+                rot_i = ((int)sheared.y + source->offset_y + h_half) * rotated.width + (sheared.x + source->offset_x + w_half);
                 rotated.pixels[(int)rot_i] = source->pixels[i];
                 i++;
             }
@@ -272,5 +269,5 @@ void drawStuff()
     sprintf(angle_str, "ANGLE: %f", deg_angle);
     drawText(65, 75, angle_str, COLOR_WHITE);
     test.texture = rotateTexture(test.angle, &Textures[BRICKS], TRANSPARENT_COLOR);
-    drawSprite(test.x - w_diff, test.y - h_diff, &test.texture);
+    drawSprite(test.x, test.y, &test.texture);
 }
